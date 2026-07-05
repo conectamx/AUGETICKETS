@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AUGE — Generador de Tickets</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --orange:#FE4701;
+  --orange-dim:rgba(254,71,1,0.12);
+  --orange-border:rgba(254,71,1,0.3);
+  --black:#000000;
+  --surface:#0d0d0d;
+  --surface2:#141414;
+  --border:rgba(255,255,255,0.08);
+  --text:#FFFFFF;
+  --muted:rgba(255,255,255,0.38);
+  --sans:'Space Grotesk',sans-serif;
+}
+
+html{scroll-behavior:smooth;background:#000}
+
+body{
+  background:#000000;
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:0 16px 80px;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* Orange glow top - decorative only, behind content */
+.bg-glow{
+  position:fixed;
+  top:-120px;left:50%;
+  transform:translateX(-50%);
+  width:500px;height:300px;
+  background:radial-gradient(ellipse,rgba(254,71,1,0.12) 0%,transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+.wrap{
+  width:100%;
+  max-width:500px;
+  position:relative;
+  z-index:1;
+  padding-top:56px;
+}
+
+/* ── HEADER ── */
+.header{margin-bottom:48px}
+
+.logo-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:32px;
+}
+.logo-icon{
+  width:40px;height:40px;
+  background:var(--orange);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-icon svg{width:20px;height:20px;fill:#fff}
+.logo-name{
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:-0.5px;
+  color:#ffffff;
+}
+
+.header-eyebrow{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--orange);
+  margin-bottom:12px;
+}
+.header h1{
+  font-size:38px;
+  font-weight:700;
+  letter-spacing:-1.2px;
+  line-height:1.05;
+  margin-bottom:12px;
+  color:#ffffff;
+}
+.header h1 em{
+  font-style:normal;
+  color:var(--orange);
+}
+.header p{
+  color:var(--muted);
+  font-size:14px;
+  font-weight:400;
+  line-height:1.6;
+  max-width:360px;
+}
+
+/* ── DIVIDER ── */
+.h-rule{
+  height:1px;
+  background:linear-gradient(90deg,var(--orange) 0%,rgba(254,71,1,0.2) 40%,transparent 100%);
+  margin:28px 0;
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px;
+  margin-bottom:16px;
+}
+
+.card-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:22px;
+  display:flex;align-items:center;gap:10px;
+}
+.card-label::after{
+  content:'';flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+/* ── FIELDS ── */
+.field{margin-bottom:16px}
+
+label{
+  display:block;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+
+input,select{
+  width:100%;
+  background:var(--surface2);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;
+  padding:13px 16px;
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:14px;
+  font-weight:500;
+  outline:none;
+  transition:border-color 0.2s,background 0.2s;
+  appearance:none;
+}
+input:focus,select:focus{
+  border-color:var(--orange);
+  background:rgba(254,71,1,0.05);
+}
+input::placeholder{color:rgba(255,255,255,0.18);font-weight:400}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(254,71,1,0.7)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:38px;
+  cursor:pointer;
+}
+select option{background:#141414;color:#fff}
+
+.row{display:flex;gap:12px}
+.row .field{flex:1}
+
+/* ── BUTTON ── */
+.btn-primary{
+  width:100%;
+  background:var(--orange);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:15px 24px;
+  font-family:var(--sans);
+  font-size:15px;
+  font-weight:700;
+  letter-spacing:0.01em;
+  cursor:pointer;
+  transition:opacity 0.18s,transform 0.15s;
+  margin-top:6px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.btn-primary:hover{opacity:0.88;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:0.25;cursor:not-allowed;transform:none}
+.btn-arrow{font-size:18px;transition:transform 0.2s}
+.btn-primary:hover .btn-arrow{transform:translateX(3px)}
+
+/* ── OUTPUT ── */
+#output-section{display:none}
+
+/* Ticket visual */
+.ticket{
+  border-radius:16px;
+  overflow:hidden;
+  margin-bottom:16px;
+  border:1px solid rgba(254,71,1,0.2);
+}
+
+.ticket-header{
+  background:var(--orange);
+  padding:20px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.ticket-brand{
+  display:flex;align-items:center;gap:10px;
+}
+.ticket-brand-icon{
+  width:28px;height:28px;
+  background:rgba(0,0,0,0.2);
+  border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ticket-brand-icon svg{width:14px;height:14px;fill:#fff}
+.ticket-brand-name{
+  font-size:15px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:-0.3px;
+}
+.ticket-folio{
+  font-size:10px;
+  font-weight:500;
+  color:rgba(255,255,255,0.65);
+  font-family:monospace;
+  letter-spacing:0.08em;
+}
+
+/* Perforation edge */
+.ticket-perf{
+  height:16px;
+  background:var(--orange);
+  position:relative;
+}
+.ticket-perf::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:16px;
+  background:var(--surface);
+  clip-path:polygon(
+    0% 100%,3.3% 0%,6.6% 100%,10% 0%,13.3% 100%,16.6% 0%,
+    20% 100%,23.3% 0%,26.6% 100%,30% 0%,33.3% 100%,36.6% 0%,
+    40% 100%,43.3% 0%,46.6% 100%,50% 0%,53.3% 100%,56.6% 0%,
+    60% 100%,63.3% 0%,66.6% 100%,70% 0%,73.3% 100%,76.6% 0%,
+    80% 100%,83.3% 0%,86.6% 100%,90% 0%,93.3% 100%,96.6% 0%,
+    100% 100%
+  );
+}
+
+.ticket-body{
+  background:var(--surface);
+  padding:22px 24px;
+}
+
+.t-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.t-row:last-of-type{border-bottom:none}
+.t-key{
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--muted);
+  flex-shrink:0;
+}
+.t-val{
+  font-size:13.5px;
+  font-weight:600;
+  text-align:right;
+  word-break:break-all;
+}
+.t-val a{color:var(--orange);text-decoration:none;font-size:12.5px}
+.t-price{
+  font-size:20px;
+  font-weight:700;
+  color:var(--orange);
+}
+
+.ticket-sep{
+  display:flex;
+  align-items:center;
+  gap:0;
+  padding:6px 0;
+}
+.sep-dot{
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--black);
+  border:1px solid rgba(254,71,1,0.2);
+  flex-shrink:0;
+}
+.sep-line{
+  flex:1;
+  border-top:1.5px dashed rgba(254,71,1,0.2);
+}
+
+/* Pagos */
+.pagos{
+  background:rgba(254,71,1,0.05);
+  border:1px solid rgba(254,71,1,0.12);
+  border-radius:10px;
+  padding:16px;
+  margin:8px 0 4px;
+}
+.pagos-title{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--orange);
+  margin-bottom:12px;
+}
+.pago-row{
+  display:flex;gap:8px;
+  font-size:12px;
+  margin-bottom:8px;
+  align-items:baseline;
+}
+.pago-row:last-child{margin-bottom:0}
+.pago-label{color:var(--muted);font-weight:500;flex-shrink:0}
+.pago-val{color:var(--text);font-family:monospace;font-size:11.5px}
+.pago-val.link{color:var(--orange);font-family:var(--sans);font-size:12px}
+
+.ticket-nota{
+  font-size:11px;
+  color:rgba(255,255,255,0.22);
+  line-height:1.65;
+  padding-top:14px;
+  border-top:1px solid rgba(255,255,255,0.05);
+  margin-top:6px;
+}
+
+/* ── RAW + COPY ── */
+.raw-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:24px;
+  margin-bottom:14px;
+}
+.raw-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+
+textarea.raw{
+  width:100%;
+  background:var(--surface2);
+  border:1px solid rgba(254,71,1,0.1);
+  border-radius:10px;
+  padding:16px;
+  color:rgba(255,255,255,0.5);
+  font-family:monospace;
+  font-size:11.5px;
+  line-height:1.75;
+  height:290px;
+  resize:vertical;
+  outline:none;
+  display:block;
+  margin-bottom:14px;
+  transition:border-color 0.2s;
+}
+textarea.raw:focus{border-color:rgba(254,71,1,0.35)}
+
+.btn-copy{
+  width:100%;
+  background:transparent;
+  border:1.5px solid var(--orange);
+  color:var(--orange);
+  border-radius:10px;
+  padding:14px;
+  font-family:var(--sans);
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background 0.2s,color 0.2s;
+  letter-spacing:0.01em;
+}
+.btn-copy:hover{background:var(--orange);color:#fff}
+.btn-copy.copied{background:var(--orange);color:#fff}
+
+.btn-secondary{
+  width:100%;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--muted);
+  border-radius:10px;
+  padding:13px;
+  font-family:var(--sans);
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  margin-top:10px;
+  transition:border-color 0.2s,color 0.2s;
+}
+.btn-secondary:hover{border-color:rgba(254,71,1,0.3);color:var(--orange)}
+
+/* ── FOOTER ── */
+.footer{
+  text-align:center;
+  margin-top:32px;
+}
+.footer-inner{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  color:rgba(255,255,255,0.18);
+  letter-spacing:0.04em;
+}
+.footer-dot{
+  width:4px;height:4px;
+  border-radius:50%;
+  background:var(--orange);
+  opacity:0.5;
+}
+
+@media(max-width:440px){
+  .header h1{font-size:30px}
+  .card,.raw-card{padding:20px}
+  .ticket-body{padding:18px 20px}
+  .ticket-header{padding:16px 20px}
+  .row{flex-direction:column;gap:0}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo-row">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+      </div>
+      <span class="logo-name">auge</span>
+    </div>
+    <div class="header-eyebrow">Uso interno · Operaciones</div>
+    <h1>Generador de<br/><em>tickets de venta</em></h1>
+    <p>Completa los datos del pedido y obtén el ticket listo para enviar.</p>
+    <div class="h-rule"></div>
+  </div>
+
+  <!-- FORM -->
+  <div class="card" id="form-section">
+    <div class="card-label">Datos del pedido</div>
+
+    <div class="field">
+      <label>📍 Link del perfil o publicación</label>
+      <input type="url" id="inp-link" placeholder="https://www.instagram.com/…" autocomplete="off"/>
+    </div>
+
+    <div class="field">
+      <label>📦 Tipo de servicio</label>
+      <select id="inp-tipo">
+        <option value="seguidores">👥 Seguidores</option>
+        <option value="likes">❤️ Likes / Reacciones</option>
+        <option value="views">👁️ Visualizaciones</option>
+        <option value="combo" selected>🎁 Combo</option>
+        <option value="comentarios">💬 Comentarios</option>
+        <option value="marketing">📊 Marketing Digital</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>✏️ Nombre del paquete</label>
+      <input type="text" id="inp-nombre" placeholder="Ej: Combo 2, Pack Starter, 1,000 Seguidores…"/>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>📌 Cantidad (opcional)</label>
+        <input type="text" id="inp-cantidad" placeholder="Ej: 1,000"/>
+      </div>
+      <div class="field">
+        <label>💵 Precio (MXN)</label>
+        <input type="number" id="inp-precio" placeholder="499"/>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-generar">
+      Generar ticket
+      <span class="btn-arrow">↗</span>
+    </button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="output-section">
+
+    <div class="ticket">
+      <div class="ticket-header">
+        <div class="ticket-brand">
+          <div class="ticket-brand-icon">
+            <svg viewBox="0 0 24 24"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
+          </div>
+          <span class="ticket-brand-name">auge</span>
+        </div>
+        <span class="ticket-folio" id="out-folio-top"></span>
+      </div>
+      <div class="ticket-perf"></div>
+
+      <div class="ticket-body">
+        <div class="t-row">
+          <span class="t-key">Fecha</span>
+          <span class="t-val" id="out-fecha"></span>
+        </div>
+        <div class="t-row">
+          <span class="t-key">Link</span>
+          <span class="t-val"><a id="out-link-a" href="#" target="_blank"></a></span>
+        </div>
+        <div class="t-row">
+          <span class="t-key">Servicio</span>
+          <span class="t-val" id="out-servicio"></span>
+        </div>
+        <div class="t-row" id="out-cantidad-row" style="display:none">
+          <span class="t-key">Cantidad</span>
+          <span class="t-val" id="out-cantidad"></span>
+        </div>
+        <div class="t-row">
+          <span class="t-key">Total</span>
+          <span class="t-val t-price" id="out-precio"></span>
+        </div>
+
+        <div class="ticket-sep">
+          <div class="sep-dot"></div>
+          <div class="sep-line"></div>
+          <div class="sep-dot"></div>
+        </div>
+
+        <div class="pagos">
+          <div class="pagos-title">💳 Métodos de pago</div>
+          <div class="pago-row">
+            <span class="pago-label">📱 Mercado Pago</span>
+            <a href="https://link.mercadopago.com.mx/conectamx" class="pago-val link" target="_blank">link.mercadopago.com.mx/conectamx</a>
+          </div>
+          <div class="pago-row">
+            <span class="pago-label">🏦 BBVA</span>
+            <span class="pago-val">4152 3144 1509 4773</span>
+          </div>
+          <div class="pago-row">
+            <span class="pago-label">🏪 OXXO</span>
+            <span class="pago-val">2242 1707 0025 8906</span>
+          </div>
+          <div class="pago-row">
+            <span class="pago-label">👤 Nombre</span>
+            <span class="pago-val">Jesus Mario M</span>
+          </div>
+        </div>
+
+        <div class="ticket-nota" id="out-nota"></div>
+      </div>
+    </div>
+
+    <div class="raw-card">
+      <div class="raw-label">Texto para WhatsApp</div>
+      <textarea class="raw" id="out-raw" readonly></textarea>
+      <button class="btn-copy" id="btn-copy">📋 Copiar ticket</button>
+      <button class="btn-secondary" id="btn-nuevo">+ Nuevo ticket</button>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-inner">
+      <span>AUGE</span>
+      <div class="footer-dot"></div>
+      <span>Uso interno</span>
+      <div class="footer-dot"></div>
+      <span>v1.0</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SERVICIOS={
+  seguidores:{emoji:'👥',entrega:'📦 Entrega progresiva y segura.',nota:'Perfil público requerido durante el proceso.'},
+  likes:{emoji:'❤️',entrega:'⚡ Entrega inmediata al confirmar pago.',nota:'La publicación debe estar visible durante el proceso.'},
+  views:{emoji:'👁️',entrega:'👁️ Entrega en menos de 24 horas.',nota:'El video debe estar público al momento del procesamiento.'},
+  combo:{emoji:'🎁',entrega:'📦 Entrega progresiva y segura.',nota:'Perfil público requerido durante el proceso.'},
+  comentarios:{emoji:'💬',entrega:'💬 Entrega en 24–48 horas.',nota:'La publicación debe estar accesible.'},
+  marketing:{emoji:'📊',entrega:'📊 Te contactamos para coordinar el inicio.',nota:'Se alineará la estrategia antes de comenzar.'}
+};
+
+function folio(){return'AUG-'+Math.floor(100000+Math.random()*900000)}
+function fecha(){
+  return new Date().toLocaleString('es-MX',{
+    day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'
+  });
+}
+
+function textoTicket(d){
+  const cant=d.cantidad?`\n📌 Cantidad: ${d.cantidad}`:'';
+  return`🎟️ Ticket de Pedido – AUGE
+🔢 Folio: ${d.folio}
+📅 Fecha: ${d.fecha}
+
+📍 Link:
+${d.link}
+
+📦 Servicio solicitado:
+✅ ${d.nombre}${cant}
+
+💵 Total: $${d.precio} MXN
+
+${d.entrega}
+
+⸻
+
+💳 MÉTODOS DE PAGO – AUGE
+
+📱 Mercado Pago:
+https://link.mercadopago.com.mx/conectamx
+
+🏦 BBVA:
+4152 3144 1509 4773
+
+🏪 OXXO:
+2242 1707 0025 8906
+
+Nombre: Jesus Mario M
+
+📩 Después del pago, envía:
+✅ Comprobante de pago
+
+🚀 Pedido listo para procesarse al confirmar el pago.
+⚠️ ${d.nota}`;
+}
+
+document.getElementById('btn-generar').addEventListener('click',()=>{
+  const link=document.getElementById('inp-link').value.trim();
+  const tipo=document.getElementById('inp-tipo').value;
+  const nombre=document.getElementById('inp-nombre').value.trim();
+  const cantidad=document.getElementById('inp-cantidad').value.trim();
+  const precio=document.getElementById('inp-precio').value.trim();
+  if(!link||!precio){alert('Completa al menos el link y el precio.');return}
+
+  const srv=SERVICIOS[tipo];
+  const f=folio();const fe=fecha();
+  const nombreFinal=nombre||(srv.emoji+' '+tipo.charAt(0).toUpperCase()+tipo.slice(1));
+  const data={link,nombre:nombreFinal,cantidad,precio,folio:f,fecha:fe,entrega:srv.entrega,nota:srv.nota};
+
+  document.getElementById('out-folio-top').textContent=f;
+  document.getElementById('out-fecha').textContent=fe;
+  const la=document.getElementById('out-link-a');
+  la.href=link;la.textContent=link.length>42?link.slice(0,42)+'…':link;
+  document.getElementById('out-servicio').textContent=nombreFinal;
+  document.getElementById('out-precio').textContent='$'+precio+' MXN';
+  document.getElementById('out-nota').textContent='⚠️ '+srv.nota+' '+srv.entrega;
+
+  const cr=document.getElementById('out-cantidad-row');
+  if(cantidad){cr.style.display='flex';document.getElementById('out-cantidad').textContent=cantidad}
+  else cr.style.display='none';
+
+  document.getElementById('out-raw').value=textoTicket(data);
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('output-section').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+
+document.getElementById('btn-copy').addEventListener('click',()=>{
+  const raw=document.getElementById('out-raw');
+  raw.select();raw.setSelectionRange(0,99999);
+  navigator.clipboard.writeText(raw.value).catch(()=>document.execCommand('copy'));
+  const btn=document.getElementById('btn-copy');
+  btn.textContent='✅ Copiado';
+  btn.classList.add('copied');
+  setTimeout(()=>{btn.textContent='📋 Copiar ticket';btn.classList.remove('copied')},2500);
+});
+
+document.getElementById('btn-nuevo').addEventListener('click',()=>{
+  ['inp-link','inp-nombre','inp-cantidad','inp-precio'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('inp-tipo').value='combo';
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('output-section').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>
